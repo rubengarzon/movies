@@ -2,31 +2,36 @@ import "./App.css";
 import { PageWrapper } from "./components/PageWrapper";
 import { Pelicula } from "./components/Pelicula";
 import { Paginacion } from "./components/Paginacion";
-import peliculasJson from "./peliculas.json";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const [paginaActual, setPaginaActual] = useState(1);
+  const [peliculas, setPeliculas] = useState([]);
   const TOTAL_POR_PAGINA = 7;
-  let peliculas = peliculasJson;
 
-  const cargarPeliculas = () => {
-    peliculas = peliculas.slice(
-      (paginaActual - 1) * TOTAL_POR_PAGINA,
-      paginaActual * TOTAL_POR_PAGINA
-    );
+  useEffect(() => {
+    buscarPeliculas();
+  }, []);
+
+  const buscarPeliculas = async () => {
+    fetch("https://lucasmoy.dev/data/react/peliculas.json")
+      .then((response) => response.json())
+      .then((peliculas) => setPeliculas(peliculas));
   };
 
   const getTotalPaginas = () => {
-    let cantidadTotalDePeliculas = peliculasJson.length;
+    let cantidadTotalDePeliculas = peliculas.length;
     return Math.ceil(cantidadTotalDePeliculas / TOTAL_POR_PAGINA);
   };
 
-  cargarPeliculas();
+  let peliculasPorPagina = peliculas.slice(
+    (paginaActual - 1) * TOTAL_POR_PAGINA,
+    paginaActual * TOTAL_POR_PAGINA
+  );
 
   return (
     <PageWrapper>
-      {peliculas.map((pelicula) => (
+      {peliculasPorPagina.map((pelicula) => (
         <Pelicula
           titulo={pelicula.titulo}
           calificacion={pelicula.calificacion}
